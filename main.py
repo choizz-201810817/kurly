@@ -7,7 +7,11 @@ rows=selBT("breview",'limit 1,2', 'review')
 print(rows)
 # %%
 import pandas as pd
+import re
 from konlpy.tag import Kkma
+import seaborn as sns
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 #%%
 # bow Bag of words
@@ -29,10 +33,24 @@ def makeWdict(sentence):
     return wdf
 
 # %%
-rows=selBT("breview",'limit 5', 'review')
+def reSen(sentence):    
+    pattern = '[^ㄱ-힣a-zA-Z0-9 .!?]'
+    return re.sub(pattern,'',sentence)
+
+rows=selBT("breview",'limit 20', 'review')
+mdf = pd.DataFrame()
 
 for r in rows:
-    sdf = makeWdict(r[0])
-    print(sdf)
+    sen = reSen(r[0])
+    sdf = makeWdict(sen)
+    print(sdf.index)
     
+    # mdf = pd.concat([mdf, sdf], axis=1).fillna(0).astype('int')
+    mdf = pd.merge(mdf, sdf, how='outer', left_index=True, right_index=True)
+    
+mdf = mdf.fillna(0)
 #%%
+plt.figure(figsize=(25,7))
+plt.imshow(mdf.values)
+
+# %%
