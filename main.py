@@ -103,5 +103,3 @@ for r in rows:
 df.iloc[:-1,:].fillna(0).plot()
 # %%
 df
-
-# %%
