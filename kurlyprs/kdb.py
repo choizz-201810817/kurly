@@ -16,12 +16,17 @@ def insRev(data):
     with sqlite3.connect(dbfile) as conn:
         cur=conn.cursor()
         cur.execute(inssql,data)
-        
-# 컬리 셀렉트하기
-def selBT(tbl='beauty',whr='where pcode=',cols='*'):
-    sql='select '+cols+' from '+tbl+' '+whr
+     
+# select 하기
+def selSQL(sql=''):
     with sqlite3.connect(dbfile) as conn:
         cur=conn.cursor()
         cur.execute(sql)
         rows=cur.fetchall()
     return rows
+        
+# 컬리 셀렉트하기
+def selBT(tbl='beauty',whr='where pcode=',cols='*'):
+    sql='select '+cols+' from '+tbl+' '+whr
+    return selSQL(sql)
+
