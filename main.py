@@ -100,6 +100,9 @@ for r in rows:
     mdf = pd.DataFrame(rows, columns=['id', str(r[0])]).set_index('id')
     df = pd.merge(df, mdf, how='outer', left_index=True, right_index=True)
 # %%
+plt.figure(figsize=(15,8))
 df.iloc[:-1,:].fillna(0).plot()
 # %%
 df
+
+# %%
