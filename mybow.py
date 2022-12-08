@@ -49,47 +49,41 @@ cl,wl=getCorpus(rows)
 print(cl)
 print(wl)
 
+# %%
+from sklearn.feature_extraction.text import CountVectorizer
+
+cv = CountVectorizer(stop_words=['록시땅','컬리'], ngram_range=(1,1), min_df=0)
+X = cv.fit_transform(cl)
+names = cv.get_feature_names_out()
+cbow = X.toarray()
+print("names:", names)
+# print('단어 인덱스:', cv.vocabulary_)
+print('cbow:', cbow)
+
+# %%
+# TF-IDF
+# 모든 문장에서 빈번하게 나오는 단어는 그 가중치 값이 떨어짐.
+# ngram으로 묶어서 "축구팀 못했다", "축구팀 잘했다" 와 같이 나오면 훨씬 낫다
+from sklearn.feature_extraction.text import TfidfVectorizer
+tv = TfidfVectorizer(stop_words=['록시땅','컬리'], ngram_range=(1,1), min_df=0)
+X = tv.fit_transform(cl)
+names=tv.get_feature_names_out()
+tbow = X.toarray()
+
+print('names:',names)
+# print('단어 인덱스:', tv.vocabulary_)
+print('tbow:', tbow)
+
+# %%
+# LDA(잠재 디리클레 할당)
+
 #%%
-trows = getTopReview(2)
+import gensim
+#%%
+trows = getTopReview(1)
 for tr in trows:
     print(tr)
     revs = getReview(tr[0])
     
 revs
-# %%
-cl, wl = getCorpus(revs)
-# %%
-wl[:10]
-#%%
-import gensim
-from gensim import corpora, models
-
-# 사전(단어 dict) 만들기
-dictionary = corpora.Dictionary(wl)
-dict(dictionary)
-
-#%%
-# 사전 기반의 bow 만들기
-print(wl[10])
-corpus = [dictionary.doc2bow(w) for w in wl]
-corpus[-3:]
-#%%
-N_TOPIC=5
-N_PASS=10
-ldaModel = gensim.models.LdaModel(corpus,
-                                 num_topics=N_TOPIC,
-                                 id2word=dictionary,
-                                 passes=N_PASS)
-topics = ldaModel.print_topics(num_topics=4)
-topics
-
-# %%
-# conda install -c conda-forge pyldavis
-import pyLDAvis
-from pyLDAvis import gensim_models
-pyLDAvis.enable_notebook()
-vis=gensim_models.prepare(ldaModel,corpus,dictionary)
-
-# %%
-vis
 # %%
