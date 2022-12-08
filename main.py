@@ -74,7 +74,7 @@ print(wl[10])
 corpus = [dictionary.doc2bow(w) for w in wl]
 corpus[-3:]
 #%%
-N_TOPIC=5
+N_TOPIC=4
 N_PASS=10
 ldaModel = gensim.models.LdaModel(corpus,
                                  num_topics=N_TOPIC,
@@ -92,4 +92,12 @@ vis=gensim_models.prepare(ldaModel,corpus,dictionary)
 
 # %%
 vis
+# %%
+corpus[0]
+# %%
+def getTopicNo(corp0):
+    topicPd = dict(list(ldaModel[corp0]))
+    tpmax = max(topicPd, key=topicPd.get)
+    return tpmax, topicPd[tpmax]
+getTopicNo(corpus[0])
 # %%
