@@ -1,8 +1,3 @@
-# JDK 설치 
-# https://www.oracle.com/java/technologies/downloads/#jdk19-windows
-# pip install konlpy, matplotlib, seaborn
-# conda install -c conda-forge pyldavis
-
 #%%
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -10,7 +5,7 @@ import seaborn as sns
 import pandas as pd
 import re
 from kurlyprs.kdb import selBT,selSQL
-from kurlyprs.kreview import getReview,getTopReview,monthBeauty,monthReview
+from kurlyprs.kreview import getReview,getTopReview
 #%%
 from konlpy.tag import Kkma
 
@@ -49,16 +44,13 @@ cl,wl=getCorpus(rows)
 print(cl)
 print(wl)
 
-monthBeauty(1)
 
 # %%
 trows=getTopReview(2)
-
 for tr in trows:
     print(tr)
     revs=getReview(tr[0])
-len(revs)
-# %%
+revs# %%
 cl,wl=getCorpus(revs)
 # %%
 wl[:10]
@@ -66,40 +58,38 @@ wl[:10]
 
 import gensim
 from gensim import corpora,models
+#사전(단어 dict) 만들기
+dictionary=corpora.Dictionary(wl)
+dict(dictionary)
+#%%
+# 사전기반의 bow 만들기 
+print(wl[10])
+corpus=[dictionary.doc2bow(w) for w in wl]
+corpus[-3:]
+#%%
+N_TOPIC=4
+N_PASS=10
+ldaModel=gensim.models.LdaModel(corpus,
+                                num_topics=N_TOPIC,
+                                id2word=dictionary,
+                                passes=N_PASS)
+topics=ldaModel.print_topics(num_topics=4)
+topics
 
-def getTopicNo(ldaModel=None,corp0=''):
+# %%
+#pip install pyLDAvis
+import pyLDAvis
+from pyLDAvis import gensim_models
+pyLDAvis.enable_notebook()
+vis=gensim_models.prepare(ldaModel,corpus,dictionary)
+vis
+
+# %%
+corpus[0]
+# %%
+def getTopicNo(corp0):
     topicPd=dict(list(ldaModel[corp0]))
     tpmax=max(topicPd,key=topicPd.get)
     return tpmax,topicPd[tpmax]
-
-
-#사전(단어 dict) 만들기
-def trainLDA(rows,notopic=4,npass=10):
-    cl,wl=getCorpus(rows)
-    dictionary=corpora.Dictionary(wl)
-    dict(dictionary)
-    # 사전기반의 bow 만들기 
-    corpus=[dictionary.doc2bow(w) for w in wl]
-    N_TOPIC=4
-    N_PASS=10
-    ldaModel=gensim.models.LdaModel(corpus,
-                                    num_topics=N_TOPIC,
-                                    id2word=dictionary,
-                                    passes=N_PASS)
-    topics=ldaModel.print_topics(num_topics=4)
-    corTopics=[]
-    for i,cor in  enumerate(corpus):
-        corTopic=getTopicNo(ldaModel,cor)
-        corTopics.append([cl[i],corTopic[0],corTopic[1]])
-    return corTopics
-        
-
-
-# %%
-rlda=trainLDA(rows)
-rlda
-# %%
-mres=monthBeauty(1)
-
-monthReview(mres[0][0])
+getTopicNo(corpus[0])
 # %%
