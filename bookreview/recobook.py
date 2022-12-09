@@ -40,9 +40,12 @@ sns.displot(bookdf[(bookdf['Year-Of-Publication']>1960) & \
 #        .apply(lambda x: True if x in userdf['User-ID'].values.tolist() else False)]
 
 rdf = ratedf[ratedf['User-ID'].isin(list(udf['User-ID']))]
-
+bestRdf = (rdf.groupby('ISBN')['Book-Rating'].sum()>100).to_frame()
+bestRdf.columns=['OK']
 # %%
-rdf.describe()
+mdf = pd.merge(rdf, bestRdf[bestRdf['OK']==True], how='inner', on='ISBN')
+mdf
+# rdf.describe()
 # %%
 ## 중복 존재 확인
 udf.duplicated().sum()
@@ -51,13 +54,25 @@ udf.duplicated().sum()
 # udup
 # %%
 ## pivor table
-uratedf = pd.merge(udf, rdf, how='left', on='User-ID')
+uratedf = pd.merge(udf, mdf, how='inner', on='User-ID')
 urdf = uratedf.fillna(0)
 urdf
 #%%
 urpivot = pd.pivot(urdf,
                    index = 'User-ID',   # 행 위치에 들어갈 열 
-                   columns = 'sex',     # 열 위치에 들어갈 열 
-                   values = 'age',      # 데이터로 사용할 열 
-                   aggfunc = 'mean')    # 데이터 집계함수
+                   columns = 'ISBN',     # 열 위치에 들어갈 열 
+                   values = 'Book-Rating')  # 데이터로 사용할 열
+
+# %%
+urpivot = urpivot.fillna(0)
+# %%
+# 유사도 기반의 추천시스템
+from sklearn.metrics.pairwise import cosine_similarity
+co_matrix = cosine_similarity(urpivot)
+#%%
+# co_matrix.shape
+codf = pd.DataFrame(co_matrix)
+
+#%%
+codf[codf.iloc[10]>0]
 # %%
