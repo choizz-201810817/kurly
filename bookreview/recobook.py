@@ -108,3 +108,39 @@ import seaborn as sns
 sns.scatterplot(pcadf, x='x', y='y', hue='cluster')
 # %%
 # 지도학습 ML
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+uratedf
+
+# %%
+rfdf = pd.merge(urpivot, udf[['User-ID','Age']], how='inner', on='User-ID')
+# %%
+rfdf = rfdf.set_index('User-ID')
+# %%
+X = rfdf.iloc[:, :-1].values
+X
+# %%
+Y = rfdf.Age.values
+Y
+# %%
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2)
+
+# %%
+rfc = RandomForestClassifier()
+rfc.fit(x_train, y_train)
+
+# %%
+pred = rfc.predict(x_test)
+acc = accuracy_score(pred, y_test)
+acc
+
+# %%
+rfi = pd.DataFrame(rfc.feature_importances_, columns=['rate'])
+
+# %%
+# recoBooks.shape
+toprfi = rfi.sort_values(by='rate', ascending=False)[:6]
+toprfi.plot(kind='bar')
+# plt.barh(len(rfc.feature_importances_),rfc.feature_importances_)
+# %%
