@@ -74,5 +74,37 @@ co_matrix = cosine_similarity(urpivot)
 codf = pd.DataFrame(co_matrix)
 
 #%%
-codf[codf.iloc[10]>0]
+codf[codf.iloc[10]>0].iloc[:,8:11]
+
 # %%
+bestUser = (codf[10].sort_values(ascending=False)[1:6].index)
+# %%
+bestRate = rdf[rdf['User-ID'].isin(bestUser)]
+recoBooks = pd.merge(bestRate, bookdf, how='inner', on='ISBN')
+recoBooks
+# %%
+# PCA 기반의 추천
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+pca.fit(urpivot)
+
+
+# %%
+pcadf = pd.DataFrame(pca.components_.T, columns=['x', 'y'])
+# %%
+pcadf.plot(x='x', y='y',kind='scatter')
+# %%
+# ML (비지도 클러스터링)
+from sklearn.cluster import KMeans
+
+kmeans = KMeans(n_clusters=3)
+kmeans.fit(pcadf)
+# %%
+pcadf['cluster'] = kmeans.labels_
+pcadf
+# %%
+import seaborn as sns
+
+sns.scatterplot(pcadf, x='x', y='y', hue='cluster')
+# %%
+# 지도학습 ML
